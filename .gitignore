@@ -1,0 +1,64 @@
+#--------------------------------------------------
+# Junk that could exist anywhere:
+.DS_Store
+*.swp
+*.tmp
+.*.gz
+
+
+#--------------------------------------------------
+# Temporary files created by Eclipse
+.tmp*
+
+
+#--------------------------------------------------
+# Editor junk
+*.project
+/.pydevproject
+/.settings/
+/.settings.xml
+/.settings.xml.old
+/.idea/
+
+
+#--------------------------------------------------
+# Build Files
+/extension/build/
+/extension/release/
+*.graphml
+
+# Output folders.  Created during Ant build.
+/webapp-build/
+/webapp-jsdoc/
+
+# RequireJS file and folder.  Created during Ant build.
+/r.js.zip
+/r.js/
+
+# Selenium downloads.  Created during Ant get-selenium task.
+/selenium/server/selenium-server.jar
+/selenium/chromedriver/
+/selenium/iedriver/
+/selenium/geckodriver/
+
+
+#--------------------------------------------------
+# Files from NPM
+/extension/node_modules/
+/node_modules/
+
+# Extensions
+/extension/firebug@software.joehewitt.com
+
+
+#--------------------------------------------------
+# Intern test files
+
+# Istanbul code coverage HTML report.
+/html-report/
+
+# Istanbul lcov data.
+/lcov.info
+
+# Test results in JUnit format.
+/report.xml
