@@ -89,6 +89,8 @@ define("harViewer", [
                     var previewTab = this.getTab("Preview");
                     var domTab = this.getTab("DOM");
                     var choiseCheck = $('#choiseCheck').val();
+                    var sourceEditor = $('#sourceEditor').val();
+                    var script = $('#script').val();
                     $('.previewList').html('');
                     if (choiseCheck === 'url') {
                         $.ajax({
@@ -126,40 +128,47 @@ define("harViewer", [
                             }
                         });
                     } else if (choiseCheck === 'script') {
-                        $.ajax({
-                            type: "POST",
-                            url: "http://parser.quynd.com:4300/capture/script",
-                            data: {script: jsonString},
-                            success: function (data) {
-                                if (data.data != 'fail') {
-                                    if (data && data !== undefined) {
-                                        previewTab.select();
-                                        if (homeTab)
-                                            homeTab.loadInProgress(false);
+                        if (sourceEditor.trim() == '' ||script.trim() == '') {
+                            $('#show-err-data').css('display', 'block');
+                            setTimeout(function () {
+                                $('#show-err-data').css('display', 'none')
+                            }, 3000);
+                        } else if (script.trim() != '' && sourceEditor.trim() != '') {
+                            $.ajax({
+                                type: "POST",
+                                url: "http://parser.quynd.com:4300/capture/script",
+                                data: {url: sourceEditor, script: script},
+                                success: function (data) {
+                                    if (data.data != 'fail') {
+                                        if (data && data !== undefined) {
+                                            previewTab.select();
+                                            if (homeTab)
+                                                homeTab.loadInProgress(false);
 
-                                        Lib.fireEvent(content, "onViewerHARLoaded");
+                                            Lib.fireEvent(content, "onViewerHARLoaded");
+                                            $('#myModal').modal('hide');
+                                            var linkImage = data.data;
+                                            $('.harViewBodies').append('<div class="images-return"><img style="width: 100%" src="http://test.quynd.com/' + linkImage + '"></div>')
+
+                                        }
+                                    } else if (data.data === 'fail') {
                                         $('#myModal').modal('hide');
-                                        var linkImage = data.data;
-                                        $('.harViewBodies').append('<div class="images-return"><img style="width: 100%" src="http://test.quynd.com/' + linkImage + '"></div>')
-
+                                        $('#show-err-data').css('display', 'block');
+                                        setTimeout(function () {
+                                            $('#show-err-data').css('display', 'none')
+                                        }, 3000);
                                     }
-                                } else if (data.data === 'fail') {
+                                },
+                                error: function (jqXHR, textStatus, err) {
+                                    //show error message
                                     $('#myModal').modal('hide');
-                                    $('#show-err-data').css('display', 'block');
+                                    $('#show-err').css('display', 'block');
                                     setTimeout(function () {
-                                        $('#show-err-data').css('display', 'none')
+                                        $('#show-err').css('display', 'none')
                                     }, 3000);
                                 }
-                            },
-                            error: function (jqXHR, textStatus, err) {
-                                //show error message
-                                $('#myModal').modal('hide');
-                                $('#show-err').css('display', 'block');
-                                setTimeout(function () {
-                                    $('#show-err').css('display', 'none')
-                                }, 3000);
-                            }
-                        });
+                            });
+                        }
                     }
 
                 },
@@ -222,7 +231,10 @@ define("harViewer", [
 
         Trace.log("HarViewer; initialized OK");
         $('.HomeTab').click(function () {
-            $('.images-return').html('')
+            $('.images-return').css('display', 'none')
+        });
+        $('.PreviewTab').click(function () {
+            $('.images-return').css('display', 'block')
         });
         $('.DOMTab').click(function () {
             $('.images-return').html('')

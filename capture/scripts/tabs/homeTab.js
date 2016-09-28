@@ -47,15 +47,17 @@ define("tabs/homeTab", [
                     $("#appendPreview").click(Lib.bindFixed(this.onAppendPreview, this));
 
                     $('#appendPreview').click(function () {
-                        if ($('#sourceEditor').val() != '') {
-
-                            $('#myModal').modal('show');
-                        } else if ($('#sourceEditor').val() === '') {
-                            $('#show-err').css('display', 'block');
+                        var sourceEditor = $('#sourceEditor').val();
+                        var script = $('#script').val();
+                        if (sourceEditor.trim() == '' || script.trim() == '') {
+                            $('#show-err-data').css('display', 'block');
                             setTimeout(function () {
-                                $('#show-err').css('display', 'none')
+                                $('#show-err-data').css('display', 'none')
                             }, 3000);
+                        } else if (script.trim() != '' && sourceEditor.trim() != '') {
+                            $('#myModal').modal('show');
                         }
+
                     });
                     $(".linkAbout").click(Lib.bind(this.onAbout, this));
                     // Registers drag-and-drop event handlers. These will be responsible for

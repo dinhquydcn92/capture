@@ -23,3 +23,6 @@
 .tabAboutBody code {
     color:  green;
 }
+div[class*="test"] {
+    background: #ffff00;
+}

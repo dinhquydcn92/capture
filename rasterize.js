@@ -28,24 +28,24 @@ if (system.args.length === 1) {
 } else {
 
     page.address = system.args[1];
-    output=system.args[2];
+    output = system.args[2];
     page.resources = [];
 
     page.onLoadStarted = function () {
         page.startTime = new Date();
     };
 
+
     page.customHeaders = {
-        "X-Test": "foo",
-        "DNT": "1",
+
         "Upgrade-Insecure-Requests": 1,
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36"
     };
 
 
     page.viewportSize = {
-        width: 1399,
-        height: 768
+        width: 1920,
+        height: 1080
     };
 
     page.onResourceReceived = function (res) {
@@ -58,24 +58,23 @@ if (system.args.length === 1) {
     };
     page.settings.userAgent = 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2049.0 Safari/537.36';
     page.onLoadFinished = function (status) {
+        return false;
         page.evaluate(function () {
-            document.body.style.background = '#fff';
-            if (typeof(ADS_CHECKER) == 'undefined') {
-                var timeloadchk = 10000;
-            } else {
-                var timeloadchk = 1000;
-            }
+            var timeloadchk = 10000;
             window.setTimeout(function () {
-
+                document.body.style.background = '#fff';
                 if (typeof(admSliderMedium) != 'undefined') {
                     admSliderMedium();
                 }
-               var checkAvaiBanHtml5 = function checkAvaiBanHtml5() {
+                var checkAvaiBanHtml5 = function checkAvaiBanHtml5() {
                     return true;
                 }
-                checkAvaiBanHtml5();
             }, timeloadchk);
         });
+        window.setTimeout(function () {
+            page.render(output);
+            phantom.exit();
+        }, 30000);
 
 
     };
@@ -89,7 +88,7 @@ if (system.args.length === 1) {
     phantom.addCookie({
         'name': '__R', /* required property */
         'value': '1', /* required property */
-        'domain': '.dantri.com.vn',
+        'domain': '.kenh14.vn',
         'path': '/', /* required property */
         'httponly': true,
         'secure': false,
@@ -98,24 +97,6 @@ if (system.args.length === 1) {
     phantom.addCookie({
         'name': '__RC', /* required property */
         'value': '4', /* required property */
-        'domain': '.dantri.com.vn',
-        'path': '/', /* required property */
-        'httponly': true,
-        'secure': false,
-        'expires': (new Date()).getTime() + (1000 * 60 * 60)   /* <-- expires in 1 hour */
-    });
-    //phantom.addCookie({
-    //    'name': 'changebeta', /* required property */
-    //    'value': '1', /* required property */
-    //    'domain': '.dantri.com.vn',
-    //    'path': '/', /* required property */
-    //    'httponly': true,
-    //    'secure': false,
-    //    'expires': (new Date()).getTime() + (1000 * 60 * 60)   /* <-- expires in 1 hour */
-    //});
-    phantom.addCookie({
-        'name': '__R', /* required property */
-        'value': '3', /* required property */
         'domain': '.kenh14.vn',
         'path': '/', /* required property */
         'httponly': true,
@@ -123,28 +104,75 @@ if (system.args.length === 1) {
         'expires': (new Date()).getTime() + (1000 * 60 * 60)   /* <-- expires in 1 hour */
     });
     phantom.addCookie({
-        'name': '__RC', /* required property */
-        'value': '5', /* required property */
+        'name': 'changebeta', /* required property */
+        'value': '1', /* required property */
         'domain': '.kenh14.vn',
         'path': '/', /* required property */
         'httponly': true,
         'secure': false,
         'expires': (new Date()).getTime() + (1000 * 60 * 60)   /* <-- expires in 1 hour */
     });
-    page.clearCookies();
-    page.clearMemoryCache();
+
+
+    var timeout1;
+    var burn = 0;
+    var fncall = function (scriptLink) {
+        var content = page.content;
+        if (burn === 0 && content.indexOf('ads_zone49') != -1) {
+            burn = 1;
+            page.evaluate(function () {
+                document.body.style.background = '#fff';
+                if (typeof(admSliderMedium) != 'undefined') {
+                    admSliderMedium();
+                }
+                var checkAvaiBanHtml5 = function checkAvaiBanHtml5() {
+                    return true;
+                };
+                var idw = document.getElementById('ads_zone49');
+                if (idw) {
+                    idw.innerHTML = '<iframe src="javacript:void(0);" frameborder="0" scrolling="no" width="980" height="250" id="bannertrack"></iframe>';
+                    window.setTimeout(function () {
+
+                    }, 1000);
+                }
+
+            });
+
+
+        }
+        if (burn === 1 && content.indexOf('bannertrack') != -1) {
+            burn = 2;
+
+            page.evaluate(function (scriptLink) {
+                var idf = document.getElementById('bannertrack');
+                var io = idf.contentWindow;
+                io.document.write(scriptLink);
+                io.close();
+
+
+            }, scriptLink);
+            window.setTimeout(function () {
+                page.render(output);
+                phantom.exit();
+            }, 30000);
+        }
+        if (burn != 2) {
+            timeout1 = setTimeout(function () {
+                fncall(scriptLink);
+            }, 1000);
+        }
+
+
+    };
     page.open(page.address, function (status) {
-        window.setTimeout(function () {
-            page.render(output);
-            phantom.exit();
-        }, 40000);
+        var fs = require('fs');
+        var content = fs.read('demo.txt');
+        fncall(content);
         return false;
         if (status !== 'success') {
             console.log(page.reason);
             console.log('FAIL to load the address' + status);
-            //phantom.exit(1);
         } else {
-
             page.endTime = new Date();
             page.title = page.evaluate(function () {
                 return document.title;
