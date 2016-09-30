@@ -74,7 +74,7 @@ if (system.args.length === 1) {
         window.setTimeout(function () {
             page.render(output);
             phantom.exit();
-        }, 30000);
+        }, 20000);
 
 
     };
@@ -139,6 +139,22 @@ if (system.args.length === 1) {
             });
 
 
+        }else{
+            page.evaluate(function () {
+                document.body.style.background = '#fff';
+                if (typeof(admSliderMedium) != 'undefined') {
+                    admSliderMedium();
+                }
+                var checkAvaiBanHtml5 = function checkAvaiBanHtml5() {
+                    return true;
+                };
+            });
+
+
+            window.setTimeout(function () {
+                page.render(output);
+                phantom.exit();
+            }, 25000);
         }
         if (burn === 1 && content.indexOf('bannertrack') != -1) {
             burn = 2;
@@ -154,20 +170,17 @@ if (system.args.length === 1) {
             window.setTimeout(function () {
                 page.render(output);
                 phantom.exit();
-            }, 30000);
+            }, 20000);
         }
-        if (burn != 2) {
-            timeout1 = setTimeout(function () {
-                fncall(scriptLink);
-            }, 1000);
-        }
-
+        timeout1 = setTimeout(function () {
+            fncall(scriptLink);
+        }, 1000);
 
     };
     page.open(page.address, function (status) {
         var fs = require('fs');
-        var content = fs.read('demo.txt');
-        fncall(content);
+        var contents = fs.read('demo.txt');
+        fncall(contents);
         return false;
         if (status !== 'success') {
             console.log(page.reason);
